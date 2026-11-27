@@ -1,5 +1,8 @@
 # Builds the Windows installer and publishes it as a GitHub Release when a version tag is pushed.
-# Usage: bump "version" in package.json, commit, then: git tag v0.2.0 && git push origin v0.2.0
+# Usage: bump "version" in package.json, commit, then: git tag v0.2.0 && git push origin main v0.2.0
+#
+# electron-builder only builds here; the release is created in a single gh call with all files.
+# Letting electron-builder publish uploads files in parallel, which can create duplicate releases.
 name: Release
 
 on:
@@ -34,7 +37,20 @@ jobs:
             exit 1
           }
 
-      - name: Build and publish
-        run: npm run release
+      - name: Build installer
+        run: npm run dist
+
+      - name: Publish release
+        shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          $version = $env:TAG.TrimStart('v')
+          $files = @(
+            "dist/LoLCoach-Setup-$version.exe",
+            "dist/LoLCoach-Setup-$version.exe.blockmap",
+            "dist/latest.yml"
+          )
+          foreach ($f in $files) { if (-not (Test-Path $f)) { Write-Error "Missing $f"; exit 1 } }
+          gh release create $env:TAG @files --title $version --notes "LoLCoach $version" --verify-tag

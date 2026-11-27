@@ -1,7 +1,7 @@
 {
   "name": "lolcoach",
   "productName": "LoLCoach",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "In-game item build overlay for League of Legends",
   "author": "Filipe Santos",
@@ -42,7 +42,8 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "LoLCoach"
+      "shortcutName": "LoLCoach",
+      "artifactName": "${productName}-Setup-${version}.${ext}"
     },
     "publish": [
       {
