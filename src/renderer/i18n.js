@@ -95,6 +95,18 @@
       'tray.toggle': 'Show/hide overlay',
       'tray.autostart': 'Start with Windows',
       'tray.quit': 'Quit',
+      'tray.checkUpdates': 'Check for updates',
+      'tray.installUpdate': 'Restart to update to v{version}',
+
+      'update.downloading': 'Downloading v{version} ({percent}%)',
+      'update.ready': 'v{version} is ready',
+      'update.restart': 'Restart to update',
+      'footer.version': 'v{version}',
+
+      'rules.outdated': 'Some rules no longer match patch {patch} ({list}). Check for an app update.',
+      'rules.items': 'items: {list}',
+      'rules.runes': 'runes: {list}',
+      'rules.champions': 'champions: {list}',
     },
 
     'pt-BR': {
@@ -190,6 +202,18 @@
       'tray.toggle': 'Mostrar/ocultar overlay',
       'tray.autostart': 'Iniciar com o Windows',
       'tray.quit': 'Sair',
+      'tray.checkUpdates': 'Verificar atualizações',
+      'tray.installUpdate': 'Reiniciar e atualizar para v{version}',
+
+      'update.downloading': 'Baixando v{version} ({percent}%)',
+      'update.ready': 'v{version} está pronta',
+      'update.restart': 'Reiniciar para atualizar',
+      'footer.version': 'v{version}',
+
+      'rules.outdated': 'Algumas regras não batem com o patch {patch} ({list}). Verifique se há atualização da app.',
+      'rules.items': 'itens: {list}',
+      'rules.runes': 'runas: {list}',
+      'rules.champions': 'campeões: {list}',
     },
   };
 

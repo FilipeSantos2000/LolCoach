@@ -116,3 +116,60 @@ test('my keystone boosts matching stats and explains it', () => {
   const voidStaff = withKeystone.items.find((i) => i.id === '3135');
   assert.ok(voidStaff.reasons.some((x) => x.key === 'reason.keystone' && x.params.rune === 'Electrocute'));
 });
+
+const { validateRules, ITEM } = require('../src/engine');
+const { flattenRunes } = require('../src/ddragon');
+
+test('validateRules reports rules pointing to missing or unbuyable things', () => {
+  // A patch where every rule target exists...
+  const items = {};
+  for (const id of Object.values(ITEM)) items[id] = item(`Item ${id}`, 3000, ['Damage']);
+  // Boots rules need tier-2 boots (built from 1001).
+  for (const id of [ITEM.STEELCAPS, ITEM.MERCS, ITEM.SORCS, ITEM.BERSERKERS, ITEM.IONIAN]) {
+    items[id] = item(`Boots ${id}`, 1100, ['Boots'], { from: ['1001'] });
+  }
+  const champions = {};
+  for (const id of ['Aatrox', 'Vladimir', 'Soraka', 'Sylas', 'DrMundo', 'Warwick', 'Yuumi', 'Fiddlesticks', 'Swain', 'Briar',
+    'Olaf', 'Nami', 'Sona', 'Seraphine', 'Illaoi', 'Fiora', 'Samira', 'Senna', 'Kayn', 'Renekton', 'Volibear',
+    'Maokai', 'Nasus', 'Trundle', 'Zac', 'Milio', 'Gwen', 'Viego', 'Belveth', 'Udyr', 'Taric', 'Karma',
+    'Leona', 'Nautilus', 'Amumu', 'Malphite', 'Sejuani', 'Lissandra', 'Morgana', 'Thresh', 'Rell', 'Ashe',
+    'Zyra', 'Annie', 'Veigar', 'Rammus', 'Alistar', 'Skarner', 'Braum', 'Lux', 'Neeko', 'Galio',
+    'Ornn', 'JarvanIV', 'Vi', 'TwistedFate', 'Sion', 'Poppy', 'Blitzcrank', 'Pyke', 'Rakan']) champions[id] = champ(id, ['Fighter'], 5, 5);
+  const runes = Object.fromEntries(Object.values(RUNE).map((id) => [id, `Rune ${id}`]));
+
+  assert.deepEqual(validateRules({ items, champions, runes }), { items: [], runes: [], champions: [], count: 0 });
+
+  // ...then one item removed, one made unbuyable, a rune and a champion gone.
+  const items2 = { ...items, [ITEM.ZHONYAS]: undefined, [ITEM.THORNMAIL]: { ...items[ITEM.THORNMAIL], gold: { total: 3000, purchasable: false } } };
+  const runes2 = { ...runes };
+  delete runes2[RUNE.CONQUEROR];
+  const champions2 = { ...champions };
+  delete champions2.Soraka;
+
+  const r = validateRules({ items: items2, champions: champions2, runes: runes2 });
+  assert.deepEqual(r.items.sort(), ['THORNMAIL', 'ZHONYAS']);
+  assert.deepEqual(r.runes, ['CONQUEROR']);
+  assert.deepEqual(r.champions, ['Soraka']);
+  assert.equal(r.count, 4);
+
+  // Without rune data (old cache), runes are not reported.
+  assert.deepEqual(validateRules({ items, champions }).runes, []);
+});
+
+test('flattenRunes maps rune ids to names', () => {
+  const trees = [{ id: 8000, slots: [{ runes: [{ id: 8010, name: 'Conqueror' }] }, { runes: [{ id: 9111, name: 'Triumph' }] }] }];
+  assert.deepEqual(flattenRunes(trees), { 8010: 'Conqueror', 9111: 'Triumph' });
+});
+
+test('newer AbilityHaste tag counts like CooldownReduction', () => {
+  const d = {
+    ...data,
+    items: {
+      a: item('Old Haste', 3000, ['SpellDamage', 'CooldownReduction']),
+      b: item('New Haste', 3000, ['SpellDamage', 'AbilityHaste']),
+    },
+  };
+  const r = recommend(game([], ['Zed']), d);
+  const [x, y] = ['a', 'b'].map((id) => r.items.find((i) => i.id === id).score);
+  assert.equal(x, y);
+});

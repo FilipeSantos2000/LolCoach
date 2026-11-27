@@ -20,7 +20,7 @@ test('every key used in source exists', () => {
   const used = new Set();
   for (const f of files) {
     const code = fs.readFileSync(path.join(SRC, f), 'utf8');
-    for (const m of code.matchAll(/'((?:status|meta|game|reason|draft|app|footer|tray)\.[\w.]+)'/g)) used.add(m[1]);
+    for (const m of code.matchAll(/'((?:status|meta|game|reason|draft|app|footer|tray|update|rules)\.[\w.]+)'/g)) used.add(m[1]);
   }
   // Dynamic keys built from known values.
   for (const flag of ['healing', 'burst', 'cc', 'crit', 'highArmor', 'highMR', 'heavyAD', 'heavyAP']) {

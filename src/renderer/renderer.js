@@ -56,16 +56,54 @@ function renderStatic() {
   $('items-title').textContent = t(lang, 'game.nextItems');
 }
 
+// Update banner: shown only while downloading or when a new version is ready.
+function renderUpdate(update) {
+  const box = $('update');
+  const button = $('update-install');
+  if (update?.state === 'downloading') {
+    $('update-text').textContent = t(lang, 'update.downloading', { version: update.version, percent: update.percent || 0 });
+    button.hidden = true;
+    box.hidden = false;
+  } else if (update?.state === 'ready') {
+    $('update-text').textContent = t(lang, 'update.ready', { version: update.version });
+    button.textContent = t(lang, 'update.restart');
+    button.hidden = false;
+    box.hidden = false;
+  } else {
+    box.hidden = true;
+  }
+}
+
+// Readable rule name: "MORTAL_REMINDER" -> "Mortal Reminder"; champion ids stay as they are.
+const ruleName = (name) => name.toLowerCase().replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+
+function renderRules(rules) {
+  const box = $('rules');
+  if (!rules?.count) {
+    box.hidden = true;
+    return;
+  }
+  const parts = [
+    rules.items.length && t(lang, 'rules.items', { list: rules.items.map(ruleName).join(', ') }),
+    rules.runes.length && t(lang, 'rules.runes', { list: rules.runes.map(ruleName).join(', ') }),
+    rules.champions.length && t(lang, 'rules.champions', { list: rules.champions.join(', ') }),
+  ].filter(Boolean);
+  box.textContent = t(lang, 'rules.outdated', { patch: rules.patch, list: parts.join('; ') });
+  box.hidden = false;
+}
+
 function renderFooter(data) {
   let meta = data.meta ? t(lang, data.meta.key, data.meta.params) : '';
   if (data.meta?.stalePatch) meta += ` ${t(lang, 'meta.usingOld', { patch: data.meta.stalePatch })}`;
   if (data.metaGames) meta += ` ${t(lang, 'meta.games', { games: data.metaGames, champion: data.me.championName })}`;
   $('meta').textContent = meta;
 
-  $('footer').textContent = data.patch
-    ? [t(lang, 'footer.patch', { patch: data.patch }), data.demo && t(lang, 'footer.demo'), t(lang, 'footer.hide')]
-      .filter(Boolean).join(' · ')
-    : '';
+  $('footer').textContent = [
+    data.version && t(lang, 'footer.version', { version: data.version }),
+    data.patch && t(lang, 'footer.patch', { patch: data.patch }),
+    data.demo && t(lang, 'footer.demo'),
+    data.patch && t(lang, 'footer.hide'),
+  ].filter(Boolean).join(' · ');
 }
 
 function renderGame(data) {
@@ -118,8 +156,12 @@ function render(data) {
   } else {
     renderGame(data);
   }
+  renderUpdate(data.update);
+  renderRules(data.rules);
   renderFooter(data);
 }
+
+$('update-install').addEventListener('click', () => window.coach.installUpdate());
 
 // Corner resize: pointer drag (deltas from drag start, one IPC per frame) or arrow keys.
 const RESIZE_STEP = 20;

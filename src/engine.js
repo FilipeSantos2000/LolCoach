@@ -5,7 +5,7 @@ const RAW_PREFIX = 'game_character_displayname_';
 
 // Item IDs used by counter rules. Missing IDs (patch changes) are skipped automatically.
 const ITEM = {
-  THORNMAIL: '3075', MORTAL_REMINDER: '3033', MORELLONOMICON: '3165', CHEMPUNK: '6609', PUTRIFIER: '3011',
+  THORNMAIL: '3075', MORTAL_REMINDER: '3033', MORELLONOMICON: '3165', CHEMPUNK: '6609',
   ZHONYAS: '3157', GUARDIAN_ANGEL: '3026', STERAKS: '3053', BANSHEES: '3102', EDGE_OF_NIGHT: '3814',
   DEATHS_DANCE: '6333', MERCURIAL: '3139', MAW: '3156', WITS_END: '3091', RANDUINS: '3143',
   VOID_STAFF: '3135', SERYLDAS: '6694', LDR: '3036', BLACK_CLEAVER: '3071', FORCE_OF_NATURE: '4401',
@@ -59,7 +59,7 @@ const OFF_TAGS = {
 // Reasons are translation keys: reason.counter.<flag> (see renderer/i18n.js).
 const COUNTERS = [
   { flag: 'healing',
-    ids: { mage: [ITEM.MORELLONOMICON], marksman: [ITEM.MORTAL_REMINDER], assassin: [ITEM.CHEMPUNK], fighter: [ITEM.CHEMPUNK], tank: [ITEM.THORNMAIL], enchanter: [ITEM.PUTRIFIER] } },
+    ids: { mage: [ITEM.MORELLONOMICON], marksman: [ITEM.MORTAL_REMINDER], assassin: [ITEM.CHEMPUNK], fighter: [ITEM.CHEMPUNK], tank: [ITEM.THORNMAIL], enchanter: [ITEM.MORELLONOMICON] } },
   { flag: 'burst',
     ids: { mage: [ITEM.ZHONYAS], marksman: [ITEM.GUARDIAN_ANGEL], assassin: [ITEM.EDGE_OF_NIGHT], fighter: [ITEM.STERAKS] } },
   { flag: 'cc', ids: { marksman: [ITEM.MERCURIAL], fighter: [ITEM.STERAKS] } },
@@ -214,6 +214,13 @@ function analyzeEnemies(enemies, data) {
   return { adShare, apShare, flags };
 }
 
+// Data Dragon renamed some tags over time; map them to the names the weights use.
+const TAG_ALIASES = { AbilityHaste: 'CooldownReduction' };
+
+function normalizeTags(tags = []) {
+  return [...new Set(tags.map((t) => TAG_ALIASES[t] || t))];
+}
+
 function isBoots(item) {
   return item.tags?.includes('Boots');
 }
@@ -353,7 +360,7 @@ function recommend(game, data, { count = 3, meta = null } = {}) {
   for (const [id, item] of Object.entries(data.items)) {
     if (ownedIds.has(id) || isBoots(item) || !isCandidate(id, item, mapNumber)) continue;
 
-    const tags = item.tags || [];
+    const tags = normalizeTags(item.tags);
     const counters = counterReasons(id, archetype, threats.flags);
     const stat = metaStat(bucket, id);
     const fits = tags.some((t) => REQUIRED_TAGS[archetype].includes(t)) &&
@@ -416,4 +423,22 @@ function recommend(game, data, { count = 3, meta = null } = {}) {
   };
 }
 
-module.exports = { recommend, analyzeEnemies, getArchetype, championIdFromPlayer, isCandidate, isCoreItem, ITEM, RUNE };
+/**
+ * Checks the hard-coded rules against the current patch data.
+ * Rules that point to items/runes/champions that no longer exist are silently skipped by the engine,
+ * so this reports them to let the user know an app update is needed.
+ * @returns {{items: string[], runes: string[], champions: string[], count: number}}
+ */
+function validateRules(data, mapNumber = 11) {
+  const items = Object.entries(ITEM)
+    .filter(([, id]) => !data.items?.[id] || !isCandidate(id, data.items[id], mapNumber))
+    .map(([name]) => name);
+  // Rune data is optional (older caches); without it, runes can't be checked.
+  const runes = data.runes
+    ? Object.entries(RUNE).filter(([, id]) => !data.runes[id]).map(([name]) => name)
+    : [];
+  const champions = [...new Set([...HEALERS, ...HEAVY_CC])].filter((id) => !data.champions?.[id]);
+  return { items, runes, champions, count: items.length + runes.length + champions.length };
+}
+
+module.exports = { recommend, analyzeEnemies, getArchetype, championIdFromPlayer, isCandidate, isCoreItem, validateRules, ITEM, RUNE };

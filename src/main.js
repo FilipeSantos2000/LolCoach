@@ -4,9 +4,10 @@ const fs = require('fs');
 const { app, BrowserWindow, ipcMain, globalShortcut, screen, Tray, Menu, nativeImage } = require('electron');
 const { t } = require('./renderer/i18n');
 const { MIN_SIZE, restoreBounds, resizeFrom } = require('./bounds');
+const { createUpdater } = require('./updater');
 const { loadStaticData, itemImageUrl } = require('./ddragon');
 const { getAllGameData } = require('./live');
-const { recommend, isCoreItem } = require('./engine');
+const { recommend, isCoreItem, validateRules } = require('./engine');
 const { RiotClient, RiotAuthError } = require('./meta/riot');
 const { patchOf, selectMeta } = require('./meta/store');
 const { collect } = require('./meta/collector');
@@ -43,6 +44,8 @@ const lcu = new LcuClient();
 
 let win = null;
 let tray = null;
+let updater = null;
+let rulesCheck = null; // outdated hard-coded rules for the loaded patch
 let staticData = null;
 let pollTimer = null;
 let metaDir = null;
@@ -149,14 +152,21 @@ function buildTrayMenu() {
     { label: t(lang, 'tray.toggle'), click: toggleOverlay },
     { type: 'separator' },
   ];
-  // Login items only make sense for the installed app (dev would register electron.exe).
+  // Login items and updates only make sense for the installed app (dev would register electron.exe).
   if (app.isPackaged) {
     items.push({
       label: t(lang, 'tray.autostart'),
       type: 'checkbox',
       checked: app.getLoginItemSettings().openAtLogin,
       click: (menuItem) => app.setLoginItemSettings({ openAtLogin: menuItem.checked }),
-    }, { type: 'separator' });
+    });
+    const update = updater?.get();
+    if (update?.state === 'ready') {
+      items.push({ label: t(lang, 'tray.installUpdate', { version: update.version }), click: () => updater.install() });
+    } else {
+      items.push({ label: t(lang, 'tray.checkUpdates'), enabled: update?.state === 'idle', click: () => updater?.check() });
+    }
+    items.push({ type: 'separator' });
   }
   items.push({ label: t(lang, 'tray.quit'), click: () => app.quit() });
   tray.setContextMenu(Menu.buildFromTemplate(items));
@@ -170,8 +180,24 @@ function createTray() {
   buildTrayMenu();
 }
 
+// Every payload carries language, app version and update state, so the overlay can always show them.
+let lastPayload = null;
 function send(payload) {
-  if (win && !win.isDestroyed()) win.webContents.send('update', { lang, ...payload });
+  lastPayload = payload;
+  if (win && !win.isDestroyed()) {
+    win.webContents.send('update', { lang, version: app.getVersion(), update: updater?.get(), rules: rulesCheck, ...payload });
+  }
+}
+
+function startUpdater() {
+  updater = createUpdater({
+    enabled: app.isPackaged,
+    loadUpdater: () => require('electron-updater').autoUpdater,
+    onChange: () => {
+      buildTrayMenu();
+      if (lastPayload) send(lastPayload); // refresh the banner without waiting for the next poll
+    },
+  });
 }
 
 function sendStatus(key, params) {
@@ -284,6 +310,9 @@ async function tick() {
     if (!staticData || staticData.locale !== LOCALES[lang]) {
       if (!staticData) sendStatus('status.loadingData');
       staticData = await loadStaticData(path.join(app.getPath('userData'), 'cache'), LOCALES[lang]);
+      const check = validateRules(staticData);
+      rulesCheck = check.count ? { ...check, patch: staticData.version } : null;
+      if (rulesCheck) console.warn('Outdated rules for patch', staticData.version, JSON.stringify(check));
       startMetaCollection();
     }
 
@@ -335,6 +364,7 @@ app.whenReady().then(() => {
   savedBounds = settings.bounds || null;
 
   createWindow();
+  startUpdater();
   createTray();
   win.webContents.once('did-finish-load', tick);
 
@@ -346,6 +376,7 @@ app.whenReady().then(() => {
 app.on('second-instance', () => win?.showInactive());
 
 ipcMain.on('close', () => app.quit());
+ipcMain.on('install-update', () => updater?.install());
 
 // The overlay switches its own texts at once; champion/item names follow on the next tick.
 ipcMain.on('set-language', (_event, next) => {
@@ -357,6 +388,7 @@ ipcMain.on('set-language', (_event, next) => {
 
 app.on('will-quit', () => {
   clearTimeout(pollTimer);
+  updater?.stop();
   metaAbort.abort(); // collector saves progress and resumes next launch
   globalShortcut.unregisterAll();
 });
