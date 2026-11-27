@@ -1,0 +1,22 @@
+{
+  "activePlayer": {
+    "riotId": "Player#EUW",
+    "summonerName": "Player",
+    "currentGold": 1450,
+    "level": 9
+  },
+  "allPlayers": [
+    { "riotId": "Player#EUW", "summonerName": "Player", "championName": "Ahri", "rawChampionName": "game_character_displayname_Ahri", "team": "ORDER", "level": 9, "position": "MIDDLE", "scores": { "kills": 3, "deaths": 1, "assists": 2 }, "runes": { "keystone": { "id": 8112, "displayName": "Electrocute" } }, "items": [ { "itemID": 1056 }, { "itemID": 3802 } ] },
+    { "riotId": "Ally1#EUW", "summonerName": "Ally1", "championName": "Garen", "rawChampionName": "game_character_displayname_Garen", "team": "ORDER", "level": 9, "position": "TOP", "scores": { "kills": 1, "deaths": 2, "assists": 0 }, "runes": { "keystone": { "id": 8010, "displayName": "Conqueror" } }, "items": [] },
+    { "riotId": "Ally2#EUW", "summonerName": "Ally2", "championName": "Lee Sin", "rawChampionName": "game_character_displayname_LeeSin", "team": "ORDER", "level": 8, "position": "JUNGLE", "scores": { "kills": 2, "deaths": 2, "assists": 3 }, "runes": { "keystone": { "id": 8010, "displayName": "Conqueror" } }, "items": [] },
+    { "riotId": "Ally3#EUW", "summonerName": "Ally3", "championName": "Caitlyn", "rawChampionName": "game_character_displayname_Caitlyn", "team": "ORDER", "level": 8, "position": "BOTTOM", "scores": { "kills": 1, "deaths": 1, "assists": 1 }, "runes": { "keystone": { "id": 8005, "displayName": "Press the Attack" } }, "items": [] },
+    { "riotId": "Ally4#EUW", "summonerName": "Ally4", "championName": "Lulu", "rawChampionName": "game_character_displayname_Lulu", "team": "ORDER", "level": 7, "position": "UTILITY", "scores": { "kills": 0, "deaths": 1, "assists": 4 }, "runes": { "keystone": { "id": 8214, "displayName": "Summon Aery" } }, "items": [] },
+    { "riotId": "Enemy1#EUW", "summonerName": "Enemy1", "championName": "Darius", "rawChampionName": "game_character_displayname_Darius", "team": "CHAOS", "level": 10, "position": "TOP", "scores": { "kills": 4, "deaths": 1, "assists": 0 }, "runes": { "keystone": { "id": 8010, "displayName": "Conqueror" } }, "items": [ { "itemID": 3071 } ] },
+    { "riotId": "Enemy2#EUW", "summonerName": "Enemy2", "championName": "Zed", "rawChampionName": "game_character_displayname_Zed", "team": "CHAOS", "level": 9, "position": "MIDDLE", "scores": { "kills": 3, "deaths": 2, "assists": 1 }, "runes": { "keystone": { "id": 8112, "displayName": "Electrocute" } }, "items": [ { "itemID": 3142 } ] },
+    { "riotId": "Enemy3#EUW", "summonerName": "Enemy3", "championName": "Kha'Zix", "rawChampionName": "game_character_displayname_Khazix", "team": "CHAOS", "level": 9, "position": "JUNGLE", "scores": { "kills": 2, "deaths": 1, "assists": 3 }, "runes": { "keystone": { "id": 8128, "displayName": "Dark Harvest" } }, "items": [] },
+    { "riotId": "Enemy4#EUW", "summonerName": "Enemy4", "championName": "Jinx", "rawChampionName": "game_character_displayname_Jinx", "team": "CHAOS", "level": 8, "position": "BOTTOM", "scores": { "kills": 1, "deaths": 1, "assists": 1 }, "runes": { "keystone": { "id": 8008, "displayName": "Lethal Tempo" } }, "items": [ { "itemID": 3031 } ] },
+    { "riotId": "Enemy5#EUW", "summonerName": "Enemy5", "championName": "Soraka", "rawChampionName": "game_character_displayname_Soraka", "team": "CHAOS", "level": 7, "position": "UTILITY", "scores": { "kills": 0, "deaths": 1, "assists": 5 }, "runes": { "keystone": { "id": 8214, "displayName": "Summon Aery" } }, "items": [] }
+  ],
+  "events": { "Events": [] },
+  "gameData": { "gameMode": "CLASSIC", "gameTime": 900.0, "mapNumber": 11 }
+}

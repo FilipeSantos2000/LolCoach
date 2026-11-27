@@ -1,0 +1,18 @@
+{
+  "localPlayerCellId": 2,
+  "myTeam": [
+    { "cellId": 0, "assignedPosition": "top", "championId": 86, "championPickIntent": 0 },
+    { "cellId": 1, "assignedPosition": "jungle", "championId": 64, "championPickIntent": 0 },
+    { "cellId": 2, "assignedPosition": "middle", "championId": 0, "championPickIntent": 0 },
+    { "cellId": 3, "assignedPosition": "bottom", "championId": 51, "championPickIntent": 0 },
+    { "cellId": 4, "assignedPosition": "utility", "championId": 0, "championPickIntent": 117 }
+  ],
+  "theirTeam": [
+    { "cellId": 5, "championId": 238 },
+    { "cellId": 6, "championId": 122 },
+    { "cellId": 7, "championId": 0 },
+    { "cellId": 8, "championId": 0 },
+    { "cellId": 9, "championId": 0 }
+  ],
+  "bans": { "myTeamBans": [], "theirTeamBans": [] }
+}

@@ -1,0 +1,44 @@
+{
+  "name": "lolcoach",
+  "productName": "LoLCoach",
+  "version": "0.1.0",
+  "private": true,
+  "description": "In-game item build overlay for League of Legends",
+  "author": "Filipe Santos",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "demo": "electron . --demo",
+    "demo:draft": "electron . --demo-draft",
+    "test": "node --test",
+    "dist": "electron-builder --win nsis"
+  },
+  "build": {
+    "appId": "com.filipesantos.lolcoach",
+    "productName": "LoLCoach",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "icon": "build/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "LoLCoach"
+    }
+  },
+  "devDependencies": {
+    "electron": "45.5.0",
+    "electron-builder": "26.18.0"
+  }
+}

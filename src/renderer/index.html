@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; script-src 'self'; style-src 'self'; img-src https://ddragon.leagueoflegends.com;">
+  <title>LoLCoach</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="panel" aria-live="polite">
+    <header class="bar">
+      <h1>LoLCoach</h1>
+      <div class="actions">
+        <button id="lang" type="button" class="lang">EN</button>
+        <button id="close" type="button" aria-label="Close overlay">&times;</button>
+      </div>
+    </header>
+
+    <p id="status" class="status"></p>
+
+    <section id="content" hidden>
+      <p id="summary" class="summary"></p>
+      <ul id="threats" class="threats"></ul>
+
+      <h2 id="boots-title"></h2>
+      <ul id="boots" class="items"></ul>
+
+      <h2 id="items-title"></h2>
+      <ol id="items" class="items"></ol>
+    </section>
+
+    <section id="draft" hidden>
+      <p id="draft-summary" class="summary"></p>
+      <h2 id="draft-title"></h2>
+      <ol id="draft-picks" class="items"></ol>
+    </section>
+
+    <p id="meta" class="footer"></p>
+    <p id="footer" class="footer"></p>
+
+    <button id="resize" type="button" class="resize-handle" aria-label="Resize"></button>
+  </main>
+  <script src="i18n.js"></script>
+  <script src="renderer.js"></script>
+</body>
+</html>
